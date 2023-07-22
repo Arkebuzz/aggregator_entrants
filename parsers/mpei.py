@@ -10,12 +10,12 @@ async def mpei_parser():
         ranked_lists = []
         universities = []
 
-        async def paid(url, n=1):
+        async def paid(url, n=1, tp=1):
             async with session.get(url) as rsp:
                 page = BeautifulSoup(await rsp.text(), 'html.parser')
 
             direction = page.find('div', {'class': 'competitive-group'}).text
-            free = page.find('div', {'class': 'title1'}).contents[4].text.split()[-1]
+            place = page.find('div', {'class': 'title1'}).contents[4].text.split()[-1]
             abits = page.find_all('tr', {'class': 'accepted'})
 
             for n, abit in enumerate(abits, n):
@@ -26,12 +26,12 @@ async def mpei_parser():
                     snils = 'Н' + snils[-7:]
 
                 score = abit.contents[1].text
-                original = 1 if abit.contents[9].text == 'да' else 0
-                priority = abit.contents[11].text
+                original = 1 if abit.contents[-6].text == 'да' else 0
+                priority = abit.contents[-4].text
 
-                ranked_lists.append(('МЭИ', direction, n, snils, score, 0, original, priority))
+                ranked_lists.append(('МЭИ', direction, tp, n, snils, score, 0, original, priority))
 
-            universities.append(('МЭИ', direction, free))
+            universities.append(('МЭИ', direction, tp, place))
 
         async def budget(url1, url2):
             async with session.get(url1) as rsp:
@@ -50,12 +50,12 @@ async def mpei_parser():
                     snils = 'Н' + snils[-7:]
 
                 score = abit.contents[2].text
-                original = 1 if abit.contents[10].text == 'да' else 0
-                priority = abit.contents[11].text
+                original = 1 if abit.contents[-5].text == 'да' else 0
+                priority = abit.contents[-4].text
 
-                ranked_lists.append(('МЭИ', direction, n, snils, score, 1, original, priority))
+                ranked_lists.append(('МЭИ', direction, 0, n, snils, score, 1, original, priority))
 
-            await paid(url2, n + 1)
+            await paid(url2, n + 1, 0)
 
         async with session.get('https://pk.mpei.ru/inform/list.html') as resp:
             contents = await resp.text()

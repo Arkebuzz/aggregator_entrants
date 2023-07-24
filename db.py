@@ -49,11 +49,11 @@ class DB:
         self.conn.close()
 
     def new_ranked_lists(self, data):
-        self.cur.executemany('INSERT OR REPLACE INTO ranked_lists VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)', data)
+        self.cur.executemany('INSERT OR REPLACE INTO ranked_lists VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL)', data)
         self.conn.commit()
 
     def new_university(self, data):
-        self.cur.executemany('INSERT OR REPLACE INTO universities VALUES(?, ?, ?, ?, 0)', data)
+        self.cur.executemany('INSERT OR REPLACE INTO universities VALUES(?, ?, ?, ?, 0, 0)', data)
         self.conn.commit()
 
     def analyze_original(self):
@@ -249,20 +249,24 @@ class DB:
 
         return self.cur.fetchall()
 
-    def get_prohodnoy(self, all_original=True):
+    def get_prohodnoy(self, university, paid=0, all_original=True):
         if all_original:
             self.cur.execute('SELECT university, direction, min(score) + 1 FROM ranked_lists '
-                             'WHERE all_original <> "NULL" AND paid = 0 AND bvi = 0 GROUP BY direction ORDER BY score')
+                             'WHERE all_original <> "NULL" AND university = ? AND paid = ? AND bvi = 0 '
+                             'GROUP BY direction ORDER BY score', (university, paid))
             balls = self.cur.fetchall()
 
-            self.cur.execute('SELECT name, direction, places > temp1 FROM universities WHERE paid = 0')
+            self.cur.execute('SELECT name, direction, places > temp1 FROM universities '
+                             'WHERE name = ? AND paid = ?', (university, paid))
             directs = {i[:2]: i[2] for i in self.cur.fetchall()}
         else:
             self.cur.execute('SELECT university, direction, min(score) + 1 FROM ranked_lists '
-                             'WHERE cur_original <> "NULL" AND paid = 0 AND bvi = 0 GROUP BY direction ORDER BY score')
+                             'WHERE cur_original <> "NULL" AND university = ? AND paid = ? AND bvi = 0 '
+                             'GROUP BY direction ORDER BY score', (university, paid))
             balls = self.cur.fetchall()
 
-            self.cur.execute('SELECT name, direction, places > temp2 FROM universities WHERE paid = 0')
+            self.cur.execute('SELECT name, direction, places > temp2 FROM universities '
+                             'WHERE name = ? AND paid = ?', (university, paid))
             directs = {i[:2]: i[2] for i in self.cur.fetchall()}
 
         res = []
@@ -274,11 +278,31 @@ class DB:
 
         return sorted(res, key=_sort_dir)
 
+    # def test(self):
+    #     self.cur.execute('SELECT DISTINCT name, direction, paid FROM universities')
+    #
+    #     for direction in self.cur.fetchall():
+    #         self.cur.execute('SELECT all_original FROM ranked_lists '
+    #                          'WHERE university = ? AND direction = ? AND all_original <> "NULL" AND paid = ? '
+    #                          'ORDER BY all_original', (*direction, ))
+    #         d = self.cur.fetchall()
+    #
+    #         if len(set(d)) != len(d):
+    #             print(direction, len(d) - len(set(d)), d)
+
 
 if __name__ == '__main__':
     db = DB()
-    # db.sort()
+    print('Максимальные проходные, если все подадут аттестаты, в реальности балл будет ниже:')
+    print(*db.get_prohodnoy('РГУ Губкина', 1), sep='\n')
 
-    print(*db.get_prohodnoy(), sep='\n')
-    print('\n\n\n')
-    print(*db.get_prohodnoy(False), sep='\n')
+    print('\n\n')
+
+    print('Проходные, по текущим поданным оригиналам, в реальности балл будет выше:')
+    print(*db.get_prohodnoy('РГУ Губкина', 1, False), sep='\n')
+
+    # print('Максимальные проходные, если все подадут аттестаты, в реальности балл будет ниже:')
+    # print(*db.get_prohodnoy('МТУСИ'), sep='\n')
+    # print('\n\n\n')
+    # print('Проходные, по текущим поданным оригиналам, в реальности балл будет выше:')
+    # print(*db.get_prohodnoy('МТУСИ', False), sep='\n')

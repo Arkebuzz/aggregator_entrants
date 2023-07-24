@@ -6,6 +6,8 @@ from bs4 import BeautifulSoup
 
 
 async def mpei_parser():
+    """Парсим МЭИ."""
+
     async with aiohttp.ClientSession() as session:
         ranked_lists = []
         universities = []

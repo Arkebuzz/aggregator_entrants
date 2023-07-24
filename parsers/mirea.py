@@ -134,6 +134,8 @@ urls_pl = [
 
 
 async def mirea_parser():
+    """Парсим МИРЭА."""
+
     async with aiohttp.ClientSession() as session:
         ranked_lists = []
         universities = []
@@ -147,8 +149,8 @@ async def mirea_parser():
             places = 10_000
             n = 1
 
-            for i in range(0, len(abits), 10):
-                abit = abits[i:i + 10]
+            for i in range(0, len(abits), 9):
+                abit = abits[i:i + 9]
 
                 snils = abit[1].text.replace('-', '').replace(' ', '')
                 snils = ('Н' + snils) if len(snils) != 11 else ('С' + snils)

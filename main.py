@@ -1,9 +1,7 @@
 import asyncio
 
 from db import DB
-from parsers.mpei import mpei_parser
-from parsers.mtuci import mtuci_parser
-from parsers.mirea import mirea_parser
+from parsers import parsers
 
 loop = asyncio.new_event_loop()
 db = DB()
@@ -18,20 +16,16 @@ a = input('Выбери действие цифрой:\n'
 
 while a != '0':
     if a == '1':
-        print('\nПарсим МЭИ.')
-        lists, univers = loop.run_until_complete(mpei_parser())
-        db.new_university(univers)
-        db.new_ranked_lists(lists)
+        print()
 
-        print('Парсим МТУСИ.')
-        lists, univers = loop.run_until_complete(mtuci_parser())
-        db.new_university(univers)
-        db.new_ranked_lists(lists)
-
-        print('Парсим МИРЭА.')
-        lists, univers = loop.run_until_complete(mirea_parser())
-        db.new_university(univers)
-        db.new_ranked_lists(lists)
+        for parser in parsers:
+            try:
+                print(parser.__doc__)
+                lists, univers = loop.run_until_complete(parser())
+                db.new_university(univers)
+                db.new_ranked_lists(lists)
+            except Exception as e:
+                print('Ошибка парсинга:', e)
 
         print('\nОбрабатываем конкурсные списки.')
         db.sort()
@@ -50,12 +44,14 @@ while a != '0':
 
     elif a == '3':
         print()
-        print(*db.get_prohodnoy(False), sep='\n')
+        data = input('Название ВУЗа, кратко и заглавными буквами, если нужно: ')
+        print(*db.get_prohodnoy(data, all_original=False), sep='\n')
         print()
 
     elif a == '4':
         print()
-        print(*db.get_prohodnoy(), sep='\n')
+        data = input('Название ВУЗа: ')
+        print(*db.get_prohodnoy(data), sep='\n')
         print()
 
     elif a == '5':

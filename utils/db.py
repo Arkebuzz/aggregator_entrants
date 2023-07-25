@@ -1,6 +1,6 @@
 import sqlite3
 
-PATH_DB = 'data.db'
+PATH_DB = 'data/data.db'
 
 
 def _sort_dir(a: str):
@@ -278,31 +278,39 @@ class DB:
 
         return sorted(res, key=_sort_dir)
 
-    # def test(self):
-    #     self.cur.execute('SELECT DISTINCT name, direction, paid FROM universities')
-    #
-    #     for direction in self.cur.fetchall():
-    #         self.cur.execute('SELECT all_original FROM ranked_lists '
-    #                          'WHERE university = ? AND direction = ? AND all_original <> "NULL" AND paid = ? '
-    #                          'ORDER BY all_original', (*direction, ))
-    #         d = self.cur.fetchall()
-    #
-    #         if len(set(d)) != len(d):
-    #             print(direction, len(d) - len(set(d)), d)
+    def get_2_prohodnoys(self, university, paid=0):
+        self.cur.execute('SELECT university, direction, min(score) + 1 FROM ranked_lists '
+                         'WHERE all_original <> "NULL" AND university = ? AND paid = ? AND bvi = 0 '
+                         'GROUP BY direction ORDER BY direction', (university, paid))
+        all_balls = self.cur.fetchall()
+
+        self.cur.execute('SELECT university, direction, min(score) + 1 FROM ranked_lists '
+                         'WHERE cur_original <> "NULL" AND university = ? AND paid = ? AND bvi = 0 '
+                         'GROUP BY direction ORDER BY direction', (university, paid))
+        cur_balls = self.cur.fetchall()
+
+        self.cur.execute('SELECT name, direction, places > temp1, places > temp2 FROM universities '
+                         'WHERE name = ? AND paid = ?', (university, paid))
+        directs = {i[:2]: i[2:] for i in self.cur.fetchall()}
+
+        res = []
+        for direct in zip(cur_balls, all_balls):
+            if directs[direct[0][:2]][1]:
+                cur = 0
+            else:
+                cur = direct[0][2]
+
+            if directs[direct[1][:2]][0]:
+                al = 0
+            else:
+                al = direct[1][2]
+
+            res.append(f'{direct[0][0]} - {direct[0][1]}:\n'
+                       f'{cur} - по поданным аттестатам, {al} - если все подадут аттестаты\n')
+
+        return res
 
 
 if __name__ == '__main__':
-    db = DB()
-    print('Максимальные проходные, если все подадут аттестаты, в реальности балл будет ниже:')
-    print(*db.get_prohodnoy('РГУ Губкина', 1), sep='\n')
-
-    print('\n\n')
-
-    print('Проходные, по текущим поданным оригиналам, в реальности балл будет выше:')
-    print(*db.get_prohodnoy('РГУ Губкина', 1, False), sep='\n')
-
-    # print('Максимальные проходные, если все подадут аттестаты, в реальности балл будет ниже:')
-    # print(*db.get_prohodnoy('МТУСИ'), sep='\n')
-    # print('\n\n\n')
-    # print('Проходные, по текущим поданным оригиналам, в реальности балл будет выше:')
-    # print(*db.get_prohodnoy('МТУСИ', False), sep='\n')
+    db = DB('../data/data.db')
+    db.sort()

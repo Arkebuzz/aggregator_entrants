@@ -134,8 +134,6 @@ urls_pl = [
 
 
 async def mirea_parser():
-    """Парсим МИРЭА."""
-
     async with aiohttp.ClientSession() as session:
         ranked_lists = []
         universities = []

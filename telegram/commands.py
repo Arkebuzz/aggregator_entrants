@@ -8,7 +8,7 @@ from aiogram import types
 from aiogram.types import Message
 from aiogram.dispatcher import FSMContext
 
-from loader import dp, bot
+from loader import dp
 from .states import UniversityForm, PlaceForm
 from utils.logger import logger
 
@@ -49,13 +49,9 @@ async def menu_action(message: Message):
 async def get_passing_points(message: Message):
     logger.info(f'{message.from_user.id} call get_passing_points')
 
-    if os.path.isfile('is_updating'):
-        await message.answer('Производится обновление БД ВУЗов, это может занять несколько минут, '
-                             'попробуйте позже.')
-    else:
-        await message.answer('Введи название ВУЗа, проходные баллы которого ты хочешь получить '
-                             '(МАИ, МИРЭА, МосПолитех, МТУСИ, МЭИ, РГУ Губкина): ')
-        await UniversityForm.wait_name.set()
+    await message.answer('Введи название ВУЗа, проходные баллы которого ты хочешь получить '
+                         '(МАИ, МИРЭА, МосПолитех, МТУСИ, МЭИ, РГУ Губкина): ')
+    await UniversityForm.wait_name.set()
 
 
 @dp.message_handler(state=UniversityForm.wait_name)
@@ -64,23 +60,23 @@ async def get_name4passing_points(message: Message, state: FSMContext):
 
     if os.path.isfile('is_updating'):
         await message.answer('Производится обновление БД ВУЗов, это может занять несколько минут, '
-                             'попробуйте позже.')
-    else:
-        name = message.text
+                             'результат данного запроса может быть неверным.')
 
-        free = db.get_2_prohodnoys(name, 0)
-        paid = db.get_2_prohodnoys(name, 1)
+    name = message.text
 
-        await message.answer('<b>Проходные на бюджетные направления:</b>')
-        for i in range(0, len(free), 15):
-            await message.answer('\n'.join(free[i: i + 15]))
+    free = db.get_2_prohodnoys(name, 0)
+    paid = db.get_2_prohodnoys(name, 1)
 
-        await message.answer('<b>Проходные на платные направления:</b>')
-        for i in range(0, len(paid), 15):
-            await message.answer('\n'.join(paid[i: i + 15]))
+    await message.answer('<b>Проходные на бюджетные направления:</b>')
+    for i in range(0, len(free), 15):
+        await message.answer('\n'.join(free[i: i + 15]))
 
-        await message.answer('Внимание, данный бот не гарантирует верность всей информации, для принятия важных '
-                             'решений обращайтесь к официальным конкурсным спискам на сайте ВУЗа.')
+    await message.answer('<b>Проходные на платные направления:</b>')
+    for i in range(0, len(paid), 15):
+        await message.answer('\n'.join(paid[i: i + 15]))
+
+    await message.answer('Внимание, данный бот не гарантирует верность всей информации, для принятия важных '
+                         'решений обращайтесь к официальным конкурсным спискам на сайте ВУЗа.')
 
     await state.finish()
 
@@ -89,12 +85,8 @@ async def get_name4passing_points(message: Message, state: FSMContext):
 async def get_your_place(message: Message):
     logger.info(f'{message.from_user.id} call get_your_place')
 
-    if os.path.isfile('is_updating'):
-        await message.answer('Производится обновление БД ВУЗов, это может занять несколько минут, '
-                             'попробуйте позже.')
-    else:
-        await message.answer('Введи СНИЛС или уникальный номер: ')
-        await PlaceForm.wait_name.set()
+    await message.answer('Введи СНИЛС или уникальный номер (без пробелов и тире): ')
+    await PlaceForm.wait_name.set()
 
 
 @dp.message_handler(state=PlaceForm.wait_name)
@@ -103,28 +95,27 @@ async def get_name4your_place(message: Message, state: FSMContext):
 
     if os.path.isfile('is_updating'):
         await message.answer('Производится обновление БД ВУЗов, это может занять несколько минут, '
-                             'попробуйте позже.')
-    else:
+                             'результат данного запроса может быть неверным.')
 
-        name = message.text
+    name = message.text
 
-        data1 = db.get_data(name)
-        data2 = db.get_data(name, False)
+    data1 = db.get_data(name)
+    data2 = db.get_data(name, False)
 
-        text = '<b>Если все перед тобой подадут оригинал, ты поступишь на:</b>\n'
-        if data1:
-            for data in data1:
-                text += f'{data[0]} - {data[1]}\nТы - {data[2]} по счёту, ' \
-                        f'{data[3]}, если все перед тобой подадут оригиналы.\n\n'
+    text = '<b>Если все перед тобой подадут оригинал, ты поступишь на:</b>\n'
+    if data1:
+        for data in data1:
+            text += f'{data[0]} - {data[1]}\nТы - {data[2]} по счёту, ' \
+                    f'{data[3]}, если все перед тобой подадут оригиналы.\n\n'
 
-        await message.answer(text)
+    await message.answer(text)
 
-        text = '<b>Судя по текущим данным о поданных оригиналах, ты поступишь на:</b>\n'
-        if data2:
-            data2 = data2[0]
-            text += f'{data2[0]} - {data2[1]}\nТы - {data2[2]} по счёту, {data2[3]}, по подавшим оригинал,\n\n'
+    text = '<b>Судя по текущим данным о поданных оригиналах, ты поступишь на:</b>\n'
+    if data2:
+        data2 = data2[0]
+        text += f'{data2[0]} - {data2[1]}\nТы - {data2[2]} по счёту, {data2[3]}, по подавшим оригинал.\n\n'
 
-        await message.answer(text)
+    await message.answer(text)
 
     await state.finish()
 

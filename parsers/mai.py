@@ -6,8 +6,6 @@ from bs4 import BeautifulSoup
 
 
 async def mai_parser():
-    """Парсим МАИ."""
-
     async with aiohttp.ClientSession() as session:
         ranked_lists = []
         universities = []

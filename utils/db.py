@@ -10,7 +10,7 @@ def _sort_dir(a: str):
 class DB:
     def __init__(self, path=PATH_DB):
         self.path = path
-        self.conn = sqlite3.connect(path)
+        self.conn = sqlite3.connect(path, check_same_thread=False)
         self.conn.execute('PRAGMA foreign_keys = ON;')
         self.cur = self.conn.cursor()
 
@@ -47,6 +47,15 @@ class DB:
 
     def close(self):
         self.conn.close()
+
+    def delete_date(self, table, **filters):
+        if filters:
+            self.cur.execute(f'DELETE FROM {table} WHERE ' +
+                             ' AND '.join(f'"{key}" = "{value}"' for key, value in filters.items()))
+        else:
+            self.cur.execute(f'DELETE FROM {table}')
+
+        self.conn.commit()
 
     def new_ranked_lists(self, data):
         self.cur.executemany('INSERT OR REPLACE INTO ranked_lists VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL)', data)

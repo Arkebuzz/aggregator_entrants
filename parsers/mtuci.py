@@ -6,8 +6,6 @@ from bs4 import BeautifulSoup
 
 
 async def mtuci_parser():
-    """Парсим МТУСИ."""
-
     connector = aiohttp.TCPConnector(limit=50, force_close=True)
 
     async with aiohttp.ClientSession(connector=connector) as session:

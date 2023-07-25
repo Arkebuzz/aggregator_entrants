@@ -1,52 +1,46 @@
 import asyncio
+import time
 import os
 
 from utils.logger import logger_agr
 from parsers import parsers
+from utils.db import DB
+
+db = DB()
+loop = asyncio.new_event_loop()
 
 
-async def update(db):
+def update():
     while True:
         logger_agr.info('Обновление конкурсных списков.')
 
         with open('is_updating', 'w') as f:
             f.write('1')
 
-        await asyncio.sleep(60)
-
-        db.close()
-
-        if os.path.isfile('data/data.db'):
-            os.remove('data/data.db')
-
-        db.__init__()
-
-        for prs in parsers:
+        for parser in parsers:
             try:
-                logger_agr.info(prs.__doc__)
-                lst, univer = await prs()
-                db.new_university(univer)
-                db.new_ranked_lists(lst)
+                logger_agr.info('Runing ' + parser.__name__)
+                lists, univers = loop.run_until_complete(parser())
+                db.delete_date('ranked_lists', university=univers[0][0])
+                db.delete_date('universities', university=univers[0][0])
+                db.new_university(univers)
+                db.new_ranked_lists(lists)
             except Exception as e:
-                logger_agr.warning('Ошибка парсинга:' + str(e))
+                logger_agr.warning('Ошибка парсинга:', e)
 
         logger_agr.info('Обрабатываем конкурсные списки.')
         db.sort()
 
         os.remove('is_updating')
+
         logger_agr.info('Операция успешно выполнена.')
 
-        await asyncio.sleep(3600)
+        time.sleep(7200)
 
 
 if __name__ == '__main__':
     if not os.path.isdir('data'):
         os.mkdir('data')
-
-    from utils.db import DB
-
-    db = DB()
-    loop = asyncio.new_event_loop()
 
     a = input('Выбери действие цифрой:\n'
               '1) Обновление конкурсных списков;\n'
@@ -62,16 +56,18 @@ if __name__ == '__main__':
 
             for parser in parsers:
                 try:
-                    print(parser.__doc__)
+                    print('Парсим', parser.name)
                     lists, univers = loop.run_until_complete(parser())
+                    db.delete_date('ranked_lists', university=parser.name)
+                    db.delete_date('universities', university=parser.name)
                     db.new_university(univers)
                     db.new_ranked_lists(lists)
                 except Exception as e:
                     print('Ошибка парсинга:', e)
 
-            # print('\nОбрабатываем конкурсные списки.')
-            # db.sort()
-            # print('\nОперация успешно выполнена.\n')
+            print('\nОбрабатываем конкурсные списки.')
+            db.sort()
+            print('\nОперация успешно выполнена.\n')
 
         elif a == '2':
             snils = input('\nТвой СНИЛС/Рег. номер (без пробелов и прочих символов): ')

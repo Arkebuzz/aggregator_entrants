@@ -6,8 +6,6 @@ from bs4 import BeautifulSoup
 
 
 async def gubkin_parser():
-    """Парсим РГУ Губкина."""
-
     async with aiohttp.ClientSession() as session:
         ranked_lists = []
         universities = []

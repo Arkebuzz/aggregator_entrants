@@ -1,4 +1,4 @@
-import asyncio
+import multiprocessing as mp
 import os
 
 from aiogram import executor
@@ -24,8 +24,8 @@ if __name__ == '__main__':
 
     db = DB()
 
-    loop = asyncio.get_event_loop()
-    loop.create_task(update(db))
+    pr = mp.Process(target=update)
+    pr.start()
     logger.info("Task has been started (update)")
 
     executor.start_polling(dp, on_startup=start, skip_updates=True)

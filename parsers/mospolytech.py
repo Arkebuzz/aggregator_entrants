@@ -64,8 +64,6 @@ specs = [
 
 
 async def mospolytech_parser():
-    """Парсим МосПолитех."""
-
     connector = aiohttp.TCPConnector(limit=50, force_close=True)
 
     async with aiohttp.ClientSession(connector=connector) as session:

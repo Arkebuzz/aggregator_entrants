@@ -66,8 +66,8 @@ async def get_name4passing_points(message: Message, state: FSMContext):
 
     name = message.text
 
-    free = db.get_2_prohodnoys(name, 0)
-    paid = db.get_2_prohodnoys(name, 1)
+    free = db.get_prohodnoy(name, 0)
+    paid = db.get_prohodnoy(name, 1)
 
     await message.answer('<b>Проходные на бюджетные направления:</b>')
     for i in range(0, len(free), 15):

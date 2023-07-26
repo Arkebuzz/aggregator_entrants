@@ -258,63 +258,34 @@ class DB:
 
         return self.cur.fetchall()
 
-    def get_prohodnoy(self, university, paid=0, all_original=True):
-        if all_original:
-            self.cur.execute('SELECT university, direction, min(score) + 1 FROM ranked_lists '
-                             'WHERE all_original <> "NULL" AND university = ? AND paid = ? AND bvi = 0 '
-                             'GROUP BY direction ORDER BY score', (university, paid))
-            balls = self.cur.fetchall()
-
-            self.cur.execute('SELECT name, direction, places > temp1 FROM universities '
-                             'WHERE name = ? AND paid = ?', (university, paid))
-            directs = {i[:2]: i[2] for i in self.cur.fetchall()}
-        else:
-            self.cur.execute('SELECT university, direction, min(score) + 1 FROM ranked_lists '
-                             'WHERE cur_original <> "NULL" AND university = ? AND paid = ? AND bvi = 0 '
-                             'GROUP BY direction ORDER BY score', (university, paid))
-            balls = self.cur.fetchall()
-
-            self.cur.execute('SELECT name, direction, places > temp2 FROM universities '
-                             'WHERE name = ? AND paid = ?', (university, paid))
-            directs = {i[:2]: i[2] for i in self.cur.fetchall()}
-
-        res = []
-        for direct in balls:
-            if directs[direct[:2]]:
-                res.append(f'{direct[0]}: {direct[1]} - 0')
-            else:
-                res.append(f'{direct[0]}: {direct[1]} - {direct[2]}')
-
-        return sorted(res, key=_sort_dir)
-
-    def get_2_prohodnoys(self, university, paid=0):
+    def get_prohodnoy(self, university, paid=0):
         self.cur.execute('SELECT university, direction, min(score) + 1 FROM ranked_lists '
                          'WHERE all_original <> "NULL" AND university = ? AND paid = ? AND bvi = 0 '
                          'GROUP BY direction ORDER BY direction', (university, paid))
-        all_balls = self.cur.fetchall()
+        all_balls = {i[:2]: i[2] for i in self.cur.fetchall()}
 
         self.cur.execute('SELECT university, direction, min(score) + 1 FROM ranked_lists '
                          'WHERE cur_original <> "NULL" AND university = ? AND paid = ? AND bvi = 0 '
                          'GROUP BY direction ORDER BY direction', (university, paid))
-        cur_balls = self.cur.fetchall()
+        cur_balls = {i[:2]: i[2] for i in self.cur.fetchall()}
 
         self.cur.execute('SELECT name, direction, places > temp1, places > temp2 FROM universities '
                          'WHERE name = ? AND paid = ?', (university, paid))
-        directs = {i[:2]: i[2:] for i in self.cur.fetchall()}
+        directs = self.cur.fetchall()
 
         res = []
-        for direct in zip(cur_balls, all_balls):
-            if directs[direct[0][:2]][1]:
+        for direct in directs:
+            if direct[2]:
                 cur = 0
             else:
-                cur = direct[0][2]
+                cur = all_balls.setdefault(direct[:2], 0)
 
-            if directs[direct[1][:2]][0]:
+            if direct[3]:
                 al = 0
             else:
-                al = direct[1][2]
+                al = cur_balls.setdefault(direct[:2], 0)
 
-            res.append(f'{direct[0][0]} - {direct[0][1]}:\n'
+            res.append(f'{direct[0]} - {direct[1]}:\n'
                        f'{cur} - по поданным аттестатам, {al} - если все подадут аттестаты\n')
 
         return res
@@ -322,4 +293,5 @@ class DB:
 
 if __name__ == '__main__':
     db = DB('../data/data.db')
+    print(db.get_prohodnoy('МИИГАиК', 1))
     # db.sort()

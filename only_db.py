@@ -56,10 +56,10 @@ if __name__ == '__main__':
 
             for parser in parsers:
                 try:
-                    print('Парсим', parser.name)
+                    print('Runing', parser.__name__)
                     lists, univers = loop.run_until_complete(parser())
-                    db.delete_date('ranked_lists', university=parser.name)
-                    db.delete_date('universities', university=parser.name)
+                    db.delete_date('ranked_lists', university=univers[0][0])
+                    db.delete_date('universities', university=univers[0][0])
                     db.new_university(univers)
                     db.new_ranked_lists(lists)
                 except Exception as e:

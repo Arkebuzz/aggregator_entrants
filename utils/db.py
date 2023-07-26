@@ -322,4 +322,4 @@ class DB:
 
 if __name__ == '__main__':
     db = DB('../data/data.db')
-    db.sort()
+    # db.sort()

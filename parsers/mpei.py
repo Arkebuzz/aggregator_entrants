@@ -16,7 +16,7 @@ async def mpei_parser():
 
             direction = page.find('div', {'class': 'competitive-group'}).text
             place = page.find('div', {'class': 'title1'}).contents[4].text.split()[-1]
-            abits = page.find_all('tr', {'class': 'accepted'})
+            abits = page.find_all('tr', {'class': True})
 
             for n, abit in enumerate(abits, n):
                 snils = abit.contents[0].text
@@ -25,7 +25,7 @@ async def mpei_parser():
                 else:
                     snils = 'Н' + snils[-7:]
 
-                score = abit.contents[1].text
+                score = abit.contents[1].text if abit.contents[1].text.strip() else 0
                 original = 1 if abit.contents[-6].text == 'да' else 0
                 priority = abit.contents[-4].text
 
@@ -38,7 +38,7 @@ async def mpei_parser():
                 page = BeautifulSoup(await rsp.text(), 'html.parser')
 
             direction = page.find('div', {'class': 'competitive-group'}).text
-            abits = page.find_all('tr', {'class': 'accepted'})
+            abits = page.find_all('tr', {'class': True})
 
             n = 0
 
@@ -84,4 +84,4 @@ async def mpei_parser():
 if __name__ == '__main__':
     loop = asyncio.new_event_loop()
 
-    print(*loop.run_until_complete(mpei_parser()), sep='\n')
+    print(loop.run_until_complete(mpei_parser()), sep='\n')

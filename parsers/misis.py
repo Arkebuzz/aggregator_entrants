@@ -19,7 +19,7 @@ async def misis_parser():
                 places = page.find('contest').text
 
                 abits = page.find('tbody').find_all('tr')
-                n = 0
+                n = 1
 
                 for abit in abits:
                     abit = abit.find_all('td')
@@ -75,4 +75,4 @@ async def misis_parser():
 if __name__ == '__main__':
     loop = asyncio.new_event_loop()
 
-    loop.run_until_complete(misis_parser())
+    print(loop.run_until_complete(misis_parser()))

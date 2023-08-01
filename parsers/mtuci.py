@@ -27,15 +27,15 @@ async def mtuci_parser():
                 snils = abit.contents[3].text.replace('-', '').replace(' ', '')
                 snils = ('Н' + snils) if len(snils) != 11 else ('С' + snils)
 
-                if len(abit.contents) == 9:
+                if len(abit.contents) == 11:
                     bvi = 1
                     score = None
                 else:
                     bvi = 0
-                    score = abit.contents[-5].text.split()[0]
+                    score = abit.contents[-7].text.split()[0]
 
-                original = 1 if abit.contents[-4].text == 'Да' else 0
-                priority = abit.contents[-3].text.split()[0]
+                original = 1 if abit.contents[-6].text == 'Да' else 0
+                priority = abit.contents[-5].text.split()[0]
 
                 ranked_lists.append(('МТУСИ', direction, tp, n, snils, score, bvi, original, priority))
 
@@ -61,4 +61,4 @@ async def mtuci_parser():
 if __name__ == '__main__':
     loop = asyncio.new_event_loop()
 
-    print(*loop.run_until_complete(mtuci_parser()), sep='\n')
+    print(loop.run_until_complete(mtuci_parser()), sep='\n')

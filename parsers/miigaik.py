@@ -87,4 +87,4 @@ async def miigaik_parser():
 if __name__ == '__main__':
     loop = asyncio.new_event_loop()
 
-    print(loop.run_until_complete(miigaik_parser())[1])
+    print(loop.run_until_complete(miigaik_parser()))

@@ -5,6 +5,25 @@ import aiohttp
 from bs4 import BeautifulSoup
 
 urls_ok = [
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748193468849593654',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205351209016630',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205344227597622',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205333570919734',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205461187861814',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205454286134582',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205428624334134',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205422769085750',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205535757344054',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205531612323126',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205591555218742',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205581416537398',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205567742057782',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205685050449206',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205659639258422',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205653593169206',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205718460177718',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205707438595382',
+    'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205764814576950',
     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205377727503670',
     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205371509447990',
     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205364832116022',
@@ -34,47 +53,6 @@ urls_ok = [
     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205728456252726',
     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205722184719670',
     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205711439961398',
-]
-
-urls_bvi = [
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748193468848545078',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748193468849593654'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205351207968054',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205351209016630'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205344226549046',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205344227597622'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205333569871158',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205333570919734'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205461186813238',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205461187861814'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205454285086006',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205454286134582'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205428623285558',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205428624334134'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205422768037174',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205422769085750'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205535756295478',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205535757344054'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205531611274550',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205531612323126'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205591554170166',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205591555218742'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205581415488822',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205581416537398'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205567741009206',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205567742057782'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205685049400630',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205685050449206'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205659638209846',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205659639258422'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205653592120630',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205653593169206'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205718459129142',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205718460177718'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205707437546806',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205707438595382'),
-    ('https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205764813528374',
-     'https://priem.mirea.ru/accepted-entrants-list/personal_code_rating.php?competition=1748205764814576950')
 ]
 
 urls_pl = [
@@ -139,6 +117,7 @@ async def mirea_parser():
         universities = []
 
         async def paid(url):
+
             async with session.get(url) as rsp:
                 page = BeautifulSoup(await rsp.text(), 'html.parser')
 
@@ -162,13 +141,15 @@ async def mirea_parser():
 
             universities.append(('МИРЭА', direction, 1, places))
 
-        async def free(url, n=1):
+        async def free(url):
             async with session.get(url) as rsp:
                 page = BeautifulSoup(await rsp.text(), 'html.parser')
 
             direction = page.find('p', {'class': 'namesListPlan'}).contents[2].text.split('/')[0]
             abits = page.find_all('tr', {'id': True})
             places = page.find('div', {'style': 'text-align: center'}).contents[0].text.split()[-1]
+
+            n = 1
 
             for abit in abits:
                 abit = abit.contents
@@ -185,36 +166,10 @@ async def mirea_parser():
 
             universities.append(('МИРЭА', direction, 0, places))
 
-        async def bvi(url1, url2):
-            async with session.get(url1) as rsp:
-                page = BeautifulSoup(await rsp.text(), 'html.parser')
-
-            direction = page.find('p', {'class': 'namesListPlan'}).contents[2].text.split('/')[0]
-            abits = page.find_all('tr', {'id': True})
-            n = 1
-
-            for abit in abits:
-                abit = abit.contents
-
-                snils = abit[1].text.replace('-', '').replace(' ', '')
-                snils = ('Н' + snils) if len(snils) != 11 else ('С' + snils)
-                score = abit[8].text
-                original = 1 if abit[5].text == 'да' else 0
-                priority = abit[2].text
-
-                ranked_lists.append(('МИРЭА', direction, 0, n, snils, score, 1, original, priority))
-
-                n += 1
-
-            await free(url2, n)
-
         tasks = []
 
         for url in urls_pl:
             tasks.append(asyncio.create_task(paid(url)))
-
-        for url in urls_bvi:
-            tasks.append(asyncio.create_task(bvi(*url)))
 
         for url in urls_ok:
             tasks.append(asyncio.create_task(free(url)))
@@ -227,4 +182,4 @@ async def mirea_parser():
 if __name__ == '__main__':
     loop = asyncio.new_event_loop()
 
-    print(*loop.run_until_complete(mirea_parser()), sep='\n')
+    print(loop.run_until_complete(mirea_parser()), sep='\n')

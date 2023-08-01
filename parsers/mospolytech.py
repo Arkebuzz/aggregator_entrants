@@ -123,4 +123,4 @@ async def mospolytech_parser():
 if __name__ == '__main__':
     loop = asyncio.new_event_loop()
 
-    loop.run_until_complete(mospolytech_parser())
+    print(loop.run_until_complete(mospolytech_parser()))

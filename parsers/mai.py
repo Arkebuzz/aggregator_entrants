@@ -116,4 +116,4 @@ async def mai_parser():
 if __name__ == '__main__':
     loop = asyncio.new_event_loop()
 
-    print(*loop.run_until_complete(mai_parser()), sep='\n')
+    print(loop.run_until_complete(mai_parser()), sep='\n')

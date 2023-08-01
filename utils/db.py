@@ -241,6 +241,7 @@ class DB:
         self.conn.commit()
 
     def sort(self):
+        self.delete_date('ranked_lists', bvi=1)
         self.analyze_original()
 
         self.cur.execute('SELECT DISTINCT name FROM universities')
@@ -248,15 +249,26 @@ class DB:
             self.sort_by_priority_all_original(university[0])
             self.sort_by_priority_cur_original(university[0])
 
-    def get_data(self, snils, all_original=True):
+    def get_place(self, snils, all_original=True):
         if all_original:
-            self.cur.execute('SELECT university, direction, number, all_original FROM ranked_lists WHERE '
+            self.cur.execute('SELECT university, direction, paid, number, all_original FROM ranked_lists WHERE '
                              f'snils LIKE "%{snils}" AND all_original <> "NULL"')
-        else:
-            self.cur.execute('SELECT university, direction, number, cur_original FROM ranked_lists WHERE '
-                             f'snils LIKE "%{snils}" AND cur_original <> "NULL"')
+            res = self.cur.fetchall()
 
-        return self.cur.fetchall()
+        else:
+            self.cur.execute('SELECT university, direction, paid, number, cur_original FROM ranked_lists WHERE '
+                             f'snils LIKE "%{snils}" AND cur_original <> "NULL"')
+            res = self.cur.fetchall()
+
+            if res:
+                res = res[0]
+
+                self.cur.execute('SELECT snils FROM ranked_lists WHERE '
+                                 f'university = ? AND direction = ? AND paid = ? AND number < ? AND original = "0"',
+                                 res[:-1])
+                res = [list(res) + [len(self.cur.fetchall())]]
+
+        return res
 
     def get_prohodnoy(self, university, paid=0):
         self.cur.execute('SELECT university, direction, min(score) + 1 FROM ranked_lists '
@@ -276,14 +288,14 @@ class DB:
         res = []
         for direct in directs:
             if direct[2]:
-                cur = 0
-            else:
-                cur = all_balls.setdefault(direct[:2], 0)
-
-            if direct[3]:
                 al = 0
             else:
-                al = cur_balls.setdefault(direct[:2], 0)
+                al = all_balls.setdefault(direct[:2], 0)
+
+            if direct[3]:
+                cur = 0
+            else:
+                cur = cur_balls.setdefault(direct[:2], 0)
 
             res.append(f'{direct[0]} - {direct[1]}:\n'
                        f'{cur} - по поданным аттестатам, {al} - если все подадут аттестаты\n')
@@ -293,5 +305,5 @@ class DB:
 
 if __name__ == '__main__':
     db = DB('../data/data.db')
-    print(db.get_prohodnoy('МИИГАиК', 1))
+    print(db.get_place('14697814316', 0))
     # db.sort()
